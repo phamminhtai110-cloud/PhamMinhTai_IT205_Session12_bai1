@@ -1,101 +1,161 @@
-# Dữ liệu giỏ hàng (list chứa dict)
-cart_items = [
-    {"id": "P001", "name": "Dien thoai iPhone 15", "number": 1, "price": 25000000},
-    {"id": "P002", "name": "Op lung Silicon", "number": 2, "price": 150000}
-]
+break_line = "===================================================="
+menu_title_text = "SMART PARKING SYSTEM"
+menu_title = f"{break_line}\n{' ' * ((len(break_line) - len(menu_title_text)) // 2)}{menu_title_text}\n{break_line}"
+
+parking_lot = []
+next_id = 1
+PRICE_MOTOR = 5000
+PRICE_CAR = 15000
 
 while True:
-    print("\n" + "="*50)
-    print("SHOPEE CART MANAGEMENT SYSTEM")
-    print("[1] Xem giỏ hàng")
-    print("[2] Thêm sản phẩm / Cộng dồn")
-    print("[3] Cập nhật số lượng")
-    print("[4] Xóa sản phẩm")
-    print("[5] Thoát")
-    choice = input("Chọn (1-5): ").strip()
+    print(menu_title)
+    print("1. Check-in (Gửi xe mới)")
+    print("2. Báo cáo tồn kho (Xe đang gửi)")
+    print("3. Tìm kiếm xe theo biển số")
+    print("4. Check-out (Tính tiền & xóa xe)")
+    print("5. Thoát chương trình")
+    print("-" * 50)
+    choice = input("Nhập lựa chọn của bạn (1-5): ").strip()
+    if not choice.isdigit() or int(choice) not in range(1, 6):
+        print("[ERR-06] Lựa chọn không hợp lệ. Vui lòng nhập số từ 1 đến 5.")
+        continue
+    choice = int(choice)
 
-    # --- Chức năng 1: Xem giỏ hàng ---
-    if choice == "1":
-        if not cart_items:
-            print("Giỏ hàng trống.")
-        else:
-            print("\nSTT | Mã SP | Tên SP               | SL | Đơn giá      | Thành tiền")
-            total_qty = 0
-            total_money = 0
-            for i, item in enumerate(cart_items, 1):
-                thanh_tien = item["number"] * item["price"]
-                total_qty += item["number"]
-                total_money += thanh_tien
-                print(f"{i:<3} | {item['id']:<5} | {item['name']:<20} | {item['number']:<2} | {item['price']:>10,}đ | {thanh_tien:>10,}đ")
-            print(f"\nTổng số lượng: {total_qty}")
-            print(f"Tổng tiền: {total_money:,}đ")
-
-    # --- Chức năng 2: Thêm sản phẩm ---
-    elif choice == "2":
-        pid = input("Mã sản phẩm: ").strip()
-        name = input("Tên sản phẩm: ").strip()
-        try:
-            so_luong = int(input("Số lượng: "))
-            don_gia = float(input("Đơn giá: "))
-            if so_luong <= 0 or don_gia < 0:
-                print("Lỗi: Số lượng phải > 0 và đơn giá >= 0")
-                continue
-        except:
-            print("Lỗi: Nhập số hợp lệ")
+    if choice == 1:
+        print("\n--- CHECK-IN (GỬI XE MỚI) ---")
+        while True:
+            plate = input("Nhập biển số xe: ").strip().upper()
+            if plate == "":
+                print("[ERR-01] Biển số không được để trống!")
+            else:
+                break
+        exist = False
+        for v in parking_lot:
+            if v["plate"] == plate:
+                exist = True
+                break
+        if exist:
+            print("[ERR-03] Biển số đã có mặt trong bãi!")
             continue
-
-        # Tìm sản phẩm theo mã
-        tim_thay = False
-        for item in cart_items:
-            if item["id"] == pid:
-                item["number"] += so_luong
-                print(f"Cộng dồn thành công. Số lượng mới: {item['number']}")
-                tim_thay = True
-                break
-        if not tim_thay:
-            cart_items.append({"id": pid, "name": name, "number": so_luong, "price": don_gia})
-            print("Thêm sản phẩm mới thành công.")
-
-    # --- Chức năng 3: Cập nhật số lượng ---
-    elif choice == "3":
-        pid = input("Mã sản phẩm cần cập nhật: ").strip()
-        try:
-            sl_moi = int(input("Số lượng mới: "))
-            if sl_moi <= 0:
-                print("Số lượng phải lớn hơn 0")
+        while True:
+            type_str = input("Loại xe (1: Xe máy, 2: Ô tô): ").strip()
+            if not type_str.isdigit():
+                print("Lỗi: Vui lòng nhập số 1 hoặc 2.")
                 continue
-        except:
-            print("Số lượng phải là số nguyên")
-            continue
+            type_val = int(type_str)
+            if type_val not in (1, 2):
+                print("Chỉ nhập 1 (Xe máy) hoặc 2 (Ô tô).")
+                continue
+            break
+        while True:
+            hour_str = input("Nhập giờ vào (0-23): ").strip()
+            if not hour_str.isdigit():
+                print("Lỗi: Vui lòng nhập số nguyên.")
+                continue
+            entry_hour = int(hour_str)
+            if entry_hour < 0 or entry_hour > 23:
+                print("Lỗi: Giờ phải từ 0 đến 23.")
+                continue
+            break
+        parking_lot.append({
+            "id": next_id,
+            "plate": plate,
+            "type": type_val,
+            "entry_time": entry_hour
+        })
+        print(f" Check-in thành công! Mã số xe: {next_id}")
+        next_id += 1
 
-        tim_thay = False
-        for item in cart_items:
-            if item["id"] == pid:
-                item["number"] = sl_moi
-                print(f"Cập nhật thành công. Số lượng mới: {sl_moi}")
-                tim_thay = True
-                break
-        if not tim_thay:
-            print("Mã sản phẩm không tồn tại.")
-
-    # --- Chức năng 4: Xóa sản phẩm ---
-    elif choice == "4":
-        pid = input("Mã sản phẩm cần xóa: ").strip()
-        vi_tri = -1
-        for i, item in enumerate(cart_items):
-            if item["id"] == pid:
-                vi_tri = i
-                break
-        if vi_tri != -1:
-            del cart_items[vi_tri]
-            print("Xóa thành công.")
+    elif choice == 2:
+        print("\n--- BÁO CÁO TỒN KHO (XE ĐANG GỬI) ---")
+        if not parking_lot:
+            print("\n[ERR-02] Bãi xe hiện đang trống!")
         else:
-            print("Mã sản phẩm không tồn tại.")
+            print("\n+----+-----------------+-----------+-------------+")
+            print("| ID | Biển số         | Loại xe   | Giờ vào     |")
+            print("+----+-----------------+-----------+-------------+")
+            for v in parking_lot:
+                loai = "Xe máy" if v["type"] == 1 else "Ô tô"
+                print(f"| {v['id']:<2} | {v['plate']:<15} | {loai:<9} | {v['entry_time']:>2} giờ      |")
+            print("+----+-----------------+-----------+-------------+")
 
-    # --- Chức năng 5: Thoát ---
-    elif choice == "5":
-        print("Cảm ơn bạn! Tạm biệt.")
+    elif choice == 3:
+        print("\n--- TÌM KIẾM XE THEO BIỂN SỐ ---")
+        while True:
+            plate = input("Nhập biển số cần tìm: ").strip().upper()
+            if plate == "":
+                print("[ERR-01] Biển số không được để trống!")
+            else:
+                break
+        found = None
+        for v in parking_lot:
+            if v["plate"] == plate:
+                found = v
+                break
+        if found is None:
+            print(f"[ERR-04] Không tìm thấy xe có biển số {plate} trong bãi!")
+        else:
+            loai = "Xe máy" if found["type"] == 1 else "Ô tô"
+            print("\n========== THÔNG TIN XE ==========")
+            print(f"Mã ID       : {found['id']}")
+            print(f"Biển số     : {found['plate']}")
+            print(f"Loại xe     : {loai}")
+            print(f"Giờ vào     : {found['entry_time']} giờ")
+            print("===================================")
+
+    elif choice == 4:
+        print("\n--- CHECK-OUT (TÍNH TIỀN & XÓA XE) ---")
+        while True:
+            plate = input("Nhập biển số xe ra: ").strip().upper()
+            if plate == "":
+                print("[ERR-01] Biển số không được để trống!")
+            else:
+                break
+        vehicle = None
+        for v in parking_lot:
+            if v["plate"] == plate:
+                vehicle = v
+                break
+        if vehicle is None:
+            print(f"[ERR-04] Không tìm thấy xe có biển số {plate} trong bãi!")
+            continue
+        while True:
+            hour_str = input("Nhập giờ ra (0-23): ").strip()
+            if not hour_str.isdigit():
+                print("Lỗi: Vui lòng nhập số nguyên.")
+                continue
+            exit_hour = int(hour_str)
+            if exit_hour < 0 or exit_hour > 23:
+                print("Lỗi: Giờ phải từ 0 đến 23.")
+                continue
+            break
+        entry_hour = vehicle["entry_time"]
+        if exit_hour < entry_hour:
+            print("[ERR-05] Giờ ra phải lớn hơn hoặc bằng giờ vào! Vui lòng nhập lại.")
+            continue
+        hours = exit_hour - entry_hour
+        if hours == 0:
+            hours = 1
+        if vehicle["type"] == 1:
+            price = PRICE_MOTOR
+            type_name = "Xe máy"
+        else:
+            price = PRICE_CAR
+            type_name = "Ô tô"
+        total = hours * price
+        print("\n========== HÓA ĐƠN TIỀN GỬI XE ==========")
+        print(f"Biển số          : {plate}")
+        print(f"Loại xe          : {type_name}")
+        print(f"Giờ vào          : {entry_hour}:00")
+        print(f"Giờ ra           : {exit_hour}:00")
+        print(f"Số giờ đỗ        : {hours} giờ")
+        print(f"Đơn giá          : {price:,}đ/giờ")
+        print("-" * 40)
+        print(f"Tổng tiền        : {total:,}đ")
+        print("=========================================")
+        parking_lot.remove(vehicle)
+        print(" Đã xóa xe khỏi danh sách. Cảm ơn quý khách!")
+
+    elif choice == 5:
+        print("\n👋 Cảm ơn bạn đã sử dụng Smart Parking System. Tạm biệt!")
         break
-
-    else:
-        print("Lựa chọn không hợp lệ (1-5).")
