@@ -157,5 +157,5 @@ while True:
         print(" Đã xóa xe khỏi danh sách. Cảm ơn quý khách!")
 
     elif choice == 5:
-        print("\n👋 Cảm ơn bạn đã sử dụng Smart Parking System. Tạm biệt!")
+        print("\n Cảm ơn bạn đã sử dụng Smart Parking System. Tạm biệt!")
         break
